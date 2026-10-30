@@ -30,6 +30,12 @@ on:
 
   # Allow manual execution via the "Run workflow" button in GitHub Actions tab
   workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: "Simulate test failure (demonstrates CI gate blocking deployment)"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -83,6 +89,8 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Run Pytest Suite with Coverage
+        env:
+          SIMULATE_INTENTIONAL_FAILURE: ${{ inputs.simulate_failure || 'false' }}
         run: |
           pytest -v --cov=app --cov-report=term-missing --cov-report=xml
 
