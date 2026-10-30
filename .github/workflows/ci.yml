@@ -1,11 +1,35 @@
 name: Apex Operations API — CI/CD Pipeline
 
 on:
+  # Trigger automatically on pushes to main branches for code/config changes only
   push:
     branches: [main, master]
     tags: ['v*']
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'requirements.txt'
+      - 'requirements-dev.txt'
+      - 'pyproject.toml'
+      - '.github/workflows/ci.yml'
+
+  # Trigger on Pull Requests targeting main
   pull_request:
     branches: [main, master]
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'requirements.txt'
+      - 'requirements-dev.txt'
+      - 'pyproject.toml'
+      - '.github/workflows/ci.yml'
+
+  # Allow manual execution via the "Run workflow" button in GitHub Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: read
