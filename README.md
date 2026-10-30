@@ -171,5 +171,5 @@ We have included a full incident demonstration script and investigation report:
 
 - **[Operations Runbook (RUNBOOK.md)](RUNBOOK.md):** Complete deploy, rollback, incident response, and troubleshooting procedures.
 - **[Architecture & Decision Memo (docs/DECISION_MEMO.md)](docs/DECISION_MEMO.md):** Trade-offs, tooling justifications, and $27/mo cloud migration roadmap.
-- **[System Architecture Diagrams (docs/architecture.md)](docs/architecture.md):** Mermaid topology, CI gating, and request lifecycle diagrams.
+- **[Architecture Diagram (docs/architecture_diagram.jpg)](docs/architecture_diagram.jpg):** Visual system architecture, container topology, and CI/CD workflow diagram.
 - **[AI Disclosure (docs/AI_DISCLOSURE.md)](docs/AI_DISCLOSURE.md):** Transparent disclosure conforming to Section 3 of the assessment guidelines.
