@@ -3,11 +3,11 @@
 # Apex Operations API — Safe Rollback Procedure (Linux/macOS)
 # ==============================================================================
 # Usage:
-#   ./scripts/rollback.sh [v1.0.0]
+#   ./scripts/rollback.sh [sha-626120f]
 # ==============================================================================
 set -euo pipefail
 
-TARGET_TAG="${1:-v1.0.0}"
+TARGET_TAG="${1:-sha-626120f}"
 
 echo "=========================================================="
 echo " Initiating Safe Rollback Procedure -> Tag: ${TARGET_TAG}"
@@ -17,8 +17,9 @@ echo "=========================================================="
 export APP_IMAGE_TAG="${TARGET_TAG}"
 echo "[1/3] Configured APP_IMAGE_TAG to ${TARGET_TAG}"
 
-# Step 2: Re-apply Docker Compose
-echo "[2/3] Re-applying Docker Compose for apex-api service..."
+# Step 2: Pull target image & re-apply Docker Compose
+echo "[2/3] Pulling image ${TARGET_TAG} from Docker Hub and re-applying..."
+docker compose pull apex-api
 docker compose up -d apex-api
 
 # Step 3: Verify Service Health & Readiness Probe
