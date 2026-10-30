@@ -1,0 +1,83 @@
+# ==============================================================================
+# Apex Operations API — Local Multi-Container Environment
+# ==============================================================================
+# Services:
+#   1. apex-db:  PostgreSQL 16 relational database with healthcheck & persistent volume
+#   2. apex-api: FastAPI backend service running non-root with readiness probe
+# ==============================================================================
+
+services:
+  apex-db:
+    image: postgres:16-alpine
+    container_name: apex-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-apex_ops_db}
+      POSTGRES_USER: ${DB_USER:-apex_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-apex_secure_dev_password_change_me}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - apex_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-apex_user} -d ${DB_NAME:-apex_ops_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - apex-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+
+  apex-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ameen2607/apex-arabia:${APP_IMAGE_TAG:-v1.0.0}
+    container_name: apex-api
+    environment:
+      APP_NAME: ${APP_NAME:-Apex Operations API}
+      APP_ENV: ${APP_ENV:-development}
+      APP_PORT: ${APP_PORT:-8000}
+      APP_HOST: 0.0.0.0
+      APP_VERSION: ${APP_IMAGE_TAG:-v1.0.0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DB_HOST: apex-db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-apex_ops_db}
+      DB_USER: ${DB_USER:-apex_user}
+      DB_PASSWORD: ${DB_PASSWORD:-apex_secure_dev_password_change_me}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-5}
+      DB_MAX_OVERFLOW: ${DB_MAX_OVERFLOW:-10}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      apex-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health/ready || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - apex-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+
+volumes:
+  apex_postgres_data:
+    name: apex_postgres_data
+
+networks:
+  apex-network:
+    name: apex-network
+    driver: bridge
